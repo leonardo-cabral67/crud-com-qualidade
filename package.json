@@ -15,5 +15,9 @@
     "@types/node": "^20.1.0",
     "nodemon": "^2.0.22",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@types/uuid": "^9.0.1",
+    "uuid": "^9.0.0"
   }
 }
