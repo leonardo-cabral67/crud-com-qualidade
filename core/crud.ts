@@ -4,16 +4,50 @@ console.log("CRUD");
 
 const DB_FILE_PATH = "./core/db";
 
-function create(content: string) {
-  fs.writeFileSync(DB_FILE_PATH, content);
-  return content;
+interface ITodo {
+  date: string;
+  content: string;
+  done: boolean;
 }
 
-function read() {
-  const contentFromDb = fs.readFileSync("./core/db");
-  return contentFromDb;
+function create(content: string): ITodo {
+  const todo: ITodo = {
+    date: new Date().toISOString(),
+    content,
+    done: false,
+  };
+
+  const todos: ITodo[] = [...read(), todo];
+
+  fs.writeFileSync(
+    DB_FILE_PATH,
+    JSON.stringify(
+      {
+        todos,
+        dogs: [],
+      },
+      null,
+      1
+    )
+  );
+
+  return todo;
 }
 
-console.log(
-  create("Estou fazendo o curso crud com qualidade. Tem uma ótima didática!")
-);
+function read(): ITodo[] {
+  const dbString = fs.readFileSync(DB_FILE_PATH, "utf-8");
+  const db = JSON.parse(dbString || "{}");
+
+  if (!db.todos) return [];
+
+  return db.todos;
+}
+
+function CLEAR_DB(): void {
+  fs.writeFileSync(DB_FILE_PATH, "");
+}
+
+CLEAR_DB();
+create("Primeira TODO!");
+create("Segunda TODO!");
+console.log(read());
