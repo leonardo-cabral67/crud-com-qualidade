@@ -6,7 +6,7 @@ console.log("CRUD");
 const DB_FILE_PATH = "./core/db";
 
 interface ITodo {
-  id: string;
+  id: UUID;
   date: string;
   content: string;
   done: boolean;
@@ -16,6 +16,8 @@ interface IUpdateTodo {
   content?: string;
   done?: boolean;
 }
+
+type UUID = string;
 
 function create(content: string): ITodo {
   const todo: ITodo = {
@@ -51,7 +53,7 @@ function read(): ITodo[] {
   return db.todos;
 }
 
-function update(id: string, partialTodo: IUpdateTodo): ITodo {
+function update(id: UUID, partialTodo: IUpdateTodo): ITodo {
   let updatedTodo;
   const todos = read();
   todos.forEach((currentTodo) => {
@@ -78,8 +80,24 @@ function update(id: string, partialTodo: IUpdateTodo): ITodo {
   return updatedTodo;
 }
 
-function updateContentById(id: string, content: string): ITodo {
+function updateContentById(id: UUID, content: string): ITodo {
   return update(id, { content });
+}
+
+function deleteById(id: UUID) {
+  const todos = read();
+  const todosWithoutOne = todos.filter((todo) => todo.id !== id);
+
+  fs.writeFileSync(
+    DB_FILE_PATH,
+    JSON.stringify(
+      {
+        todos: todosWithoutOne,
+      },
+      null,
+      1
+    )
+  );
 }
 
 function CLEAR_DB(): void {
@@ -87,12 +105,17 @@ function CLEAR_DB(): void {
 }
 
 CLEAR_DB();
-create("Primeira TODO!");
+const firstTodo = create("Primeira TODO!");
 const secondTodo = create("Segunda TODO!");
 const thirdTodo = create("Terceira TODO!");
+
+deleteById(firstTodo.id);
+
 update(secondTodo.id, {
   content: "Segunda TODO   A T U A L I Z A D A",
   done: true,
 });
+
 updateContentById(thirdTodo.id, "Atualizando conteúdo");
+
 console.log(read());
